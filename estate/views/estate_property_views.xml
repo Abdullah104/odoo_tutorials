@@ -20,6 +20,7 @@
         <field name="selling_price" />
         <field name="date_availability" />
         <field name="property_type_id" />
+        <field name="tag_ids" widget="many2many_tags" />
       </list>
     </field>
   </record>
@@ -32,6 +33,7 @@
         <sheet>
           <field name="name" />
           <group>
+            <field name="tag_ids" widget="many2many_tags" />
             <group>
               <field name="property_type_id" />
               <field name="postcode" />
@@ -53,6 +55,12 @@
                 <field name="garden" />
                 <field name="garden_area" />
                 <field name="garden_orientation" />
+              </group>
+            </page>
+            <page string="Other Info">
+              <group>
+                <field name="salesperson_id" />
+                <field name="buyer_id" />
               </group>
             </page>
           </notebook>
