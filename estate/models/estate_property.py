@@ -1,5 +1,7 @@
-from odoo import fields, models, api, exceptions
+from odoo import fields, models, api
 from dateutil.relativedelta import relativedelta
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools import float_compare, float_is_zero
 
 
 class EstateProperty(models.Model):
@@ -54,6 +56,19 @@ class EstateProperty(models.Model):
     )
     best_offer = fields.Float(compute="_compute_best_offer")
 
+    _sql_constraints = [
+        (
+            "expected_price_strictly_positive",
+            "CHECK(expected_price > 0)",
+            "The expected price must be strictly positive",
+        ),
+        (
+            "selling_price_positive",
+            "CHECK(selling_price >= 0)",
+            "The selling price must be positive",
+        ),
+    ]
+
     @api.depends("living_area", "garden_area")
     def _compute_total_area(self):
         for record in self:
@@ -73,10 +88,30 @@ class EstateProperty(models.Model):
         self.garden_area = 10 if garden else None
         self.garden_orientation = "north" if garden else None
 
+    @api.constrains("selling_price", "expected_price")
+    def _check_selling_price(self):
+        precision_digits = 2
+
+        for record in self:
+            if float_is_zero(record.selling_price, precision_digits=precision_digits):
+                continue
+
+            if (
+                float_compare(
+                    record.selling_price,
+                    record.expected_price * 0.9,
+                    precision_digits=precision_digits,
+                )
+                == -1
+            ):
+                raise ValidationError(
+                    "The selling price cannot be less than 90% of the expected price"
+                )
+
     def action_sell_property(self):
         for record in self:
             if record.state == "cancelled":
-                raise exceptions.UserError("Cancelled properties cannot be sold")
+                raise UserError("Cancelled properties cannot be sold")
 
             record.state = "sold"
 
@@ -85,7 +120,7 @@ class EstateProperty(models.Model):
     def action_cancel_property(self):
         for record in self:
             if record.state == "sold":
-                raise exceptions.UserError("Sold properties cannot be cancelled")
+                raise UserError("Sold properties cannot be cancelled")
 
             record.state = "cancelled"
 
