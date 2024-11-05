@@ -43,7 +43,7 @@ class EstateProperty(models.Model):
         ],
         required=True,
         default="new",
-        string="Status"
+        string="Status",
     )
     property_type_id = fields.Many2one("estate.property.type")
     buyer_id = fields.Many2one("res.partner", copy=False)
@@ -88,6 +88,11 @@ class EstateProperty(models.Model):
 
         self.garden_area = 10 if garden else None
         self.garden_orientation = "north" if garden else None
+
+    @api.onchange("offer_ids", "state")
+    def _onchange_offer_ids(self):
+        if self.state == "new" and len(self.offer_ids) > 0:
+            self.state = "offer_received"
 
     @api.constrains("selling_price", "expected_price")
     def _check_selling_price(self):
