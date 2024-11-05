@@ -37,7 +37,7 @@ class EstateProperty(models.Model):
         selection=[
             ("new", "New"),
             ("offer_received", "Offer Received"),
-            ("accepted", "Offer Accepted"),
+            ("offer_accepted", "Offer Accepted"),
             ("sold", "Sold"),
             ("cancelled", "Cancelled"),
         ],
