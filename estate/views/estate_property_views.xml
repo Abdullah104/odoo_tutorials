@@ -41,7 +41,7 @@
           <group>
             <field name="tag_ids" widget="many2many_tags" />
             <group>
-              <field name="state" string="Status" />
+              <field name="state" />
               <field name="property_type_id" />
               <field name="postcode" />
               <field name="date_availability" />
