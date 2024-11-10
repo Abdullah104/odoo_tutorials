@@ -7,7 +7,7 @@ from odoo.tools import float_compare, float_is_zero
 class EstateProperty(models.Model):
     _name = "estate.property"
     _description = "Real Estate Properties"
-    _order = 'id desc'
+    _order = "id desc"
 
     name = fields.Char(required=True, string="Title")
     description = fields.Text()
@@ -58,18 +58,13 @@ class EstateProperty(models.Model):
     )
     best_offer = fields.Float(compute="_compute_best_offer")
 
-    _sql_constraints = [
-        (
-            "expected_price_strictly_positive",
-            "CHECK(expected_price > 0)",
-            "The expected price must be strictly positive",
-        ),
-        (
-            "selling_price_positive",
-            "CHECK(selling_price >= 0)",
-            "The selling price must be positive",
-        ),
-    ]
+    _check_expected_price_strictly_positive = models.Constraint(
+        "CHECK(expected_price > 0)", "The expected price must be strictly positive"
+    )
+
+    _check_selling_price_positive = models.Constraint(
+        "CHECK(selling_price >= 0)", "The selling price must be positive"
+    )
 
     @api.depends("living_area", "garden_area")
     def _compute_total_area(self):

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 class EstatePropertyOffer(models.Model):
     _name = "estate.property.offer"
     _description = "Estate Property Offer"
-    _order = 'price desc'
+    _order = "price desc"
 
     price = fields.Float()
     status = fields.Selection(
@@ -21,9 +21,9 @@ class EstatePropertyOffer(models.Model):
         string="Deadline",
     )
 
-    _sql_constraints = [
-        ("price_positive", "CHECK(price > 0)", "The price must be positive")
-    ]
+    _check_price_positive = models.Constraint(
+        "CHECK(price > 0)", "The price must be positive"
+    )
 
     @api.depends("create_date", "validity")
     def _compute_date_deadline(self):
