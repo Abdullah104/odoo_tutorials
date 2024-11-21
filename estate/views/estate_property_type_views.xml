@@ -12,16 +12,12 @@
     <field name="model">estate.property.type</field>
     <field name="arch" type="xml">
       <form string="Property Type">
-        <header>
+        <sheet>
           <div name="button_box" class="oe_button_box">
-            <button type="action" name="%(estate.estate_property_offer_action)d" string="Offers" icon="fa-money" class="oe_stat_button">
-              <span class="o_stat_text">
-                <field class="o_stat_text" widget="statinfo" name="offer_count" string="Offers" />
-              </span>
+            <button type="action" name="%(estate.estate_property_offer_action)d" icon="fa-money" class="oe_stat_button">
+              <field widget="statinfo" name="offer_count" string="Offers" />
             </button>
           </div>
-        </header>
-        <sheet>
           <h1>
             <field name="name" />
           </h1>
