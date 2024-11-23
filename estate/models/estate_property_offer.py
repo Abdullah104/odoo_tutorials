@@ -35,6 +35,27 @@ class EstatePropertyOffer(models.Model):
 
             record.date_deadline = create_date + timedelta(days=record.validity)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            property = self.env["estate.property"].browse(vals["property_id"])
+            offers = property.offer_ids
+
+            if len(offers) > 0:
+                highest_offer = max(offer.price for offer in property.offer_ids)
+
+                if vals["price"] < highest_offer:
+                    raise exceptions.UserError(
+                        "The higher must be higher than or equal to {}".format(
+                            highest_offer
+                        )
+                    )
+
+            if property.state == "new":
+                property.state = "offer_received"
+
+        return super().create(vals_list)
+
     def _inverse_date_deadline(self):
         for record in self:
             create_date = record.create_date or fields.Date.today()

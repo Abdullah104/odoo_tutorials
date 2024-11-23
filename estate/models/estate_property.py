@@ -85,11 +85,6 @@ class EstateProperty(models.Model):
         self.garden_area = 10 if garden else None
         self.garden_orientation = "north" if garden else None
 
-    @api.onchange("offer_ids", "state")
-    def _onchange_offer_ids(self):
-        if self.state == "new" and len(self.offer_ids) > 0:
-            self.state = "offer_received"
-
     @api.constrains("selling_price", "expected_price")
     def _check_selling_price(self):
         precision_digits = 2
@@ -109,6 +104,11 @@ class EstateProperty(models.Model):
                 raise ValidationError(
                     "The selling price cannot be less than 90% of the expected price"
                 )
+
+    @api.ondelete(at_uninstall=False)
+    def unlink_if_new_or_cancelled(self):
+        if any(record.state not in ["new", "cancelled"] for record in self):
+            raise UserError("Only new and cancelled properties can be deleted")
 
     def action_sell_property(self):
         for record in self:
